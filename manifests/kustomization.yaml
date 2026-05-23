@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: honcho
+
+resources:
+  - namespace.yaml
+  - postgres/secret.yaml
+  - postgres/service.yaml
+  - postgres/statefulset.yaml
+  - redis/service.yaml
+  - redis/deployment.yaml
+  - honcho/configmap.yaml
+  - honcho/secret.yaml
+  - honcho/service.yaml
+  - honcho/vip.yaml
+  - honcho/deployment.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: honcho
+      app.kubernetes.io/managed-by: argocd
+    includeSelectors: false
