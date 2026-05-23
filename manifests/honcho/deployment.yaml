@@ -14,6 +14,24 @@ spec:
       labels:
         app: honcho
     spec:
+      # Wait for postgres + redis to be reachable before starting honcho.
+      # Without this, honcho's entrypoint races against pg's readiness on
+      # cold-boot and crash-loops 2-3 times before stabilising.
+      initContainers:
+        - name: wait-for-deps
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "[init] waiting for postgres:5432..."
+              until nc -z postgres 5432; do sleep 1; done
+              echo "[init] postgres ready"
+              echo "[init] waiting for redis:6379..."
+              until nc -z redis 6379; do sleep 1; done
+              echo "[init] redis ready"
+              echo "[init] all dependencies up — handing off to honcho"
       containers:
         - name: honcho
           image: localhost/honcho:v3.0.7
