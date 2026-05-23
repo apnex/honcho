@@ -15,7 +15,7 @@ data:
   LLM_DEFAULT_MAX_TOKENS: "4096"
 
   # Route every Honcho LLM call through the same proxy Hermes uses.
-  # Models on proxy: smart-fast, smart-reasoning, smart-coder.
+  # Models on proxy: smart-fast, smart-reasoning, smart-coder, smart-embedding.
   DERIVER_MODEL_CONFIG__TRANSPORT: "openai"
   DERIVER_MODEL_CONFIG__MODEL: "smart-fast"
   DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL: "https://litellm-proxy-5muxctm3ta-km.a.run.app/v1"
@@ -45,7 +45,16 @@ data:
   # Re-enable once you have data + cost telemetry.
   DREAM_ENABLED: "false"
 
-  # Embeddings — proxy may or may not expose an embedding model.
-  # Disable Honcho's embedding feature for v1 by leaving it default (text-embedding-3-small).
-  # NOTE: this will FAIL if the proxy doesn't have OpenAI embeddings configured.
-  # If embedding errors appear in logs, we'll route to a local embedder later.
+  # --- Embeddings: vertex_ai/gemini-embedding-001 via LiteLLM proxy ---
+  # transport=openai because the proxy speaks OpenAI; LiteLLM translates to Vertex.
+  # dimensions_mode=always forces sending `dimensions=` so we get 3072-d vectors
+  # (gemini-embedding-001 default is 3072 but supports MRL truncation).
+  # API key falls back to LLM_OPENAI_API_KEY (already in honcho-llm-keys secret).
+  EMBEDDING_MODEL_CONFIG__TRANSPORT: "openai"
+  EMBEDDING_MODEL_CONFIG__MODEL: "smart-embedding"
+  EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL: "https://litellm-proxy-5muxctm3ta-km.a.run.app/v1"
+  EMBEDDING_MODEL_CONFIG__DIMENSIONS_MODE: "always"
+  EMBEDDING_VECTOR_DIMENSIONS: "3072"
+
+  # pgvector column width must match embedding dimensions.
+  VECTOR_STORE_DIMENSIONS: "3072"
