@@ -45,6 +45,12 @@ data:
   # Re-enable once you have data + cost telemetry.
   DREAM_ENABLED: "false"
 
+  # Process every queued work unit immediately instead of waiting for the
+  # representation batch to hit REPRESENTATION_BATCH_MAX_TOKENS. Right setting
+  # for low-volume / personal instances where latency > throughput. Flip to
+  # false once we have enough traffic that batching is worthwhile.
+  DERIVER_FLUSH_ENABLED: "true"
+
   # --- Embeddings: vertex_ai/gemini-embedding-001 via LiteLLM proxy ---
   # transport=openai because the proxy speaks OpenAI; LiteLLM translates to Vertex.
   # dimensions_mode=always forces sending `dimensions=` so we get 3072-d vectors
