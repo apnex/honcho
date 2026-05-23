@@ -56,5 +56,3 @@ data:
   EMBEDDING_MODEL_CONFIG__DIMENSIONS_MODE: "always"
   EMBEDDING_VECTOR_DIMENSIONS: "3072"
 
-  # pgvector column width must match embedding dimensions.
-  VECTOR_STORE_DIMENSIONS: "3072"

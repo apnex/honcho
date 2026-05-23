@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: honcho-deriver
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: honcho-deriver
+  template:
+    metadata:
+      labels:
+        app: honcho-deriver
+    spec:
+      containers:
+        - name: deriver
+          image: localhost/honcho:v3.0.7
+          imagePullPolicy: Never
+          # Run the queue worker rather than the API server.
+          # `python -m src.deriver` calls validate_embedding_schema (fail-fast
+          # if pgvector column dimension != EMBEDDING_VECTOR_DIMENSIONS),
+          # then drains the queue table via queue_manager.main().
+          command: ["/app/.venv/bin/python", "-m", "src.deriver"]
+          envFrom:
+            - configMapRef:
+                name: honcho-config
+            - secretRef:
+                name: honcho-llm-keys
+          # No HTTP server → no readiness/liveness probes. If the process dies,
+          # the Deployment restarts it. Prometheus metrics on 9090 are scraped
+          # in-cluster only and not exposed via a Service yet.
+          resources:
+            requests: { cpu: 200m, memory: 512Mi }
+            limits:   { cpu: "2",  memory: 2Gi }
