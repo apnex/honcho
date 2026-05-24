@@ -41,9 +41,29 @@ data:
   DIALECTIC_LEVELS__max__MODEL_CONFIG__MODEL: "smart-reasoning"
   DIALECTIC_LEVELS__max__MODEL_CONFIG__OVERRIDES__BASE_URL: "https://litellm-proxy-5muxctm3ta-km.a.run.app/v1"
 
-  # Disable dream consolidation initially (avoids unexpected background LLM spend).
-  # Re-enable once you have data + cost telemetry.
-  DREAM_ENABLED: "false"
+  # --- Dreamer (deductive + inductive consolidation) ---
+  # Enabled 2026-05-25 (DEFERRED-04 in kate/docs/memory/04-implementation-plan.md).
+  # Specialist model configs default to gpt-5.4-mini via OpenAI public API in
+  # v3.0.7 - they MUST be re-pointed at our LiteLLM proxy or dream cycles fail
+  # silently (no LLM endpoint = no observations written). Same wiring pattern
+  # as DERIVER_MODEL_CONFIG / DIALECTIC_LEVELS / EMBEDDING_MODEL_CONFIG above.
+  #
+  # Cost containment: DREAM.MIN_HOURS_BETWEEN_DREAMS=8 (upstream default) caps
+  # cycles to <=3/day per collection. ENABLED_TYPES=["omni"] runs both
+  # deduction + induction in one cycle (orchestrator.py:193,221).
+  DREAM_ENABLED: "true"
+
+  # Deduction: high-confidence rollups; may write peer-card (can_update_peer_card=True).
+  # Quality matters more than cost here - use smart-reasoning.
+  DREAM_DEDUCTION_MODEL_CONFIG__TRANSPORT: "openai"
+  DREAM_DEDUCTION_MODEL_CONFIG__MODEL: "smart-reasoning"
+  DREAM_DEDUCTION_MODEL_CONFIG__OVERRIDES__BASE_URL: "https://litellm-proxy-5muxctm3ta-km.a.run.app/v1"
+
+  # Induction: pattern generalizations; cannot write peer-card (can_update_peer_card=False).
+  # Larger observation sets; smart-coder is a proven tool-calling substitute.
+  DREAM_INDUCTION_MODEL_CONFIG__TRANSPORT: "openai"
+  DREAM_INDUCTION_MODEL_CONFIG__MODEL: "smart-coder"
+  DREAM_INDUCTION_MODEL_CONFIG__OVERRIDES__BASE_URL: "https://litellm-proxy-5muxctm3ta-km.a.run.app/v1"
 
   # Process every queued work unit immediately instead of waiting for the
   # representation batch to hit REPRESENTATION_BATCH_MAX_TOKENS. Right setting
