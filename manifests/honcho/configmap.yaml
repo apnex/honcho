@@ -53,6 +53,10 @@ data:
   # deduction + induction in one cycle (orchestrator.py:193,221).
   DREAM_ENABLED: "true"
 
+  # TEMPORARY: lowered to 1 for first-cycle live verification (DEFERRED-04 Phase 4).
+  # REVERT to 60 (upstream default) once a dream cycle completes successfully.
+  DREAM_IDLE_TIMEOUT_MINUTES: "1"
+
   # Deduction: high-confidence rollups; may write peer-card (can_update_peer_card=True).
   # Quality matters more than cost here - use smart-reasoning.
   DREAM_DEDUCTION_MODEL_CONFIG__TRANSPORT: "openai"
