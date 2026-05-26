@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: vip-honcho
   annotations:
-    metallb.universe.tf/allow-shared-ip: "host"
+    metallb.io/allow-shared-ip: "host"
 spec:
   type: LoadBalancer
   selector:
