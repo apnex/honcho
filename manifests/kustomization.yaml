@@ -5,6 +5,7 @@ namespace: honcho
 
 resources:
   - namespace.yaml
+  - postgres/pv.yaml
   - postgres/secret.yaml
   - postgres/service.yaml
   - postgres/statefulset.yaml

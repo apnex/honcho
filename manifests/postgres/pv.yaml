@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: honcho-postgres-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-path-static
+  local:
+    path: /var/lib/rancher/k3s/storage/static/honcho-postgres
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - obpc
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    namespace: honcho
+    name: data-postgres-0
